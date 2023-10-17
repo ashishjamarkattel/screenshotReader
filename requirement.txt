@@ -1,0 +1,9 @@
+openai
+easyocr
+python-dotenv
+faiss-cpu
+pandas
+fastapi
+uvicorn
+setuptools
+wheel
