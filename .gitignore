@@ -3,3 +3,5 @@ env
 *.jpg
 *.csv
 *.idx
+*.PNG
+screenshotreader.egg-info\*
