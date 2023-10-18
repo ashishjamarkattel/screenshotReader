@@ -4,4 +4,4 @@ env
 *.csv
 *.idx
 *.PNG
-screenshotreader.egg-info\*
+screenshotreader.egg-info

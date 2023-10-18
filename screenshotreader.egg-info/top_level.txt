@@ -1,5 +1,0 @@
-faiss_idx
-images
-models
-prompt
-src
