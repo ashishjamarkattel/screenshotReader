@@ -5,3 +5,4 @@ env
 *.idx
 *.PNG
 screenshotreader.egg-info
+__pycache__
