@@ -2,6 +2,7 @@
 
 import os
 import numpy as np
+import json
 
 def check_faiss_import():
     """Import faiss if available, otherwise raise error."""
@@ -53,7 +54,7 @@ class FAISS:
         self.title_desc_json = title_desc_json
         self.title_dec_vector = title_desc_vector
         self.title_desc = title_desc
-        self.faiss_idx_store_folder = "../faiss_idx"
+        self.faiss_idx_store_folder = "faiss_idx"
 
     @classmethod
     def embed_document(
@@ -64,11 +65,12 @@ class FAISS:
         """"Method embedded the title and description"""
 
         embedding_model = check_sentencepiece_import()
-
+        title_desc_json = json.loads(title_desc_json)
         title = title_desc_json["title"]
         description = title_desc_json["description"]
         title_desc = title + "##description" + description
         title_desc_vector = embedding_model.encode(title_desc)
+
 
         return cls(title_desc_json, title_desc_vector.tolist(), title_desc)
     
@@ -88,14 +90,14 @@ class FAISS:
 
 
         faiss = check_faiss_import()
-        user_faiss_index_file_name = f"../faiss_idx/{unique_user_id}.idx"
-        user_csv_file_name = f"../faiss_idx/{unique_user_id}.csv"
+        user_faiss_index_file_name = f"faiss_idx/{unique_user_id}.idx"
+        user_csv_file_name = f"faiss_idx/{unique_user_id}.csv"
 
         if not os.path.isfile(user_faiss_index_file_name):
             index = faiss.IndexFlatL2(384) 
             index = faiss.IndexIDMap(index)
             embeddings = np.array([self.title_dec_vector]).astype('float32')
-            ids = np.array([1], dtype='int64')
+            ids = np.array([0], dtype='int64')
             index.add_with_ids(embeddings, ids)
             new_text_desc_row = {
                 "text": self.title_desc
@@ -116,9 +118,11 @@ class FAISS:
             }
             user_df = pd.read_csv(user_csv_file_name)
             user_df.loc[len(user_df)] = new_text_desc_row
+            index.add_with_ids(embeddings, ids)
+
 
             user_df.to_csv(user_csv_file_name, index=False)
-            index.add_with_ids(embeddings, ids)
+            faiss.write_index(index, user_faiss_index_file_name)    ##save the faiss index file
 
     @staticmethod
     def similarity_search(
@@ -145,14 +149,15 @@ class FAISS:
         embedding = np.array([query_vector]).astype('float32')
 
         ##load the faiss and dataframe
-        user_faiss_index_file_name = f"../faiss_idx/{unique_user_id}.idx"
-        user_csv_file_name = f"../faiss_idx/{unique_user_id}.csv"
+        user_faiss_index_file_name = f"faiss_idx/{unique_user_id}.idx"
+        user_csv_file_name = f"faiss_idx/{unique_user_id}.csv"
         user_index = faiss.read_index(user_faiss_index_file_name)
         user_csv = pd.read_csv(user_csv_file_name)
 
         ## search the query in the faiss index
         distances, index = user_index.search(embedding, k)
-        value_stored = user_csv.iloc[index[0][0]]["text"]
+        print(index)
+        value_stored = user_csv.iloc[index[0][0]-1]["text"]  ##faiss index start with 1
         return value_stored
         
 

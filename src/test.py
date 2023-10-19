@@ -17,11 +17,12 @@ model = SentenceTransformer('all-MiniLM-L6-v2')
 
 # faiss.write_index(index, index_file) #optional
 
-index = faiss.read_index("faiss_index_file.idx")
+index = faiss.read_index("../faiss_idx/123.idx")
 text = "add 2 number "
 xc = model.encode(text)
 embeddings = np.array([xc]).astype('float32')
-
+print(index.ntotal)
 ids = np.array([3], dtype='int64')
 index.add_with_ids(embeddings, ids)
+faiss.write_index(index, "../faiss_idx/123.idx")
 print(index.ntotal)

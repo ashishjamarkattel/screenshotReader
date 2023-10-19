@@ -4,7 +4,7 @@ Wrapper around OpenAI APIs.
 import os
 import json
 
-from validate_keys import get_key_from_env
+from src.validate_keys import get_key_from_env
 
 
 _PROMPT_TEMPLATE = """
@@ -76,7 +76,7 @@ class GenerateTitleDesc:
                                         )
 
         
-        return json.dumps(response['choices'][0]['message']['content'])
+        return response['choices'][0]['message']['content']
 
 
 ### usages of the class

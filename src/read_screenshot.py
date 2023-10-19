@@ -22,7 +22,6 @@ class ReadScreenShot:
         
         reader = easyocr.Reader(['en']) # set easyocr for english language
         result = reader.readtext(self.image_path)  ## read the text from the image provided
-        
         ##get the text from the image
         screenshot_text = ""
         if len(result)> 0:
